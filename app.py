@@ -1,6 +1,5 @@
 import streamlit as st
 import pickle
-from streamlit_option_menu import option_menu
 
 # Change Name & Logo
 st.set_page_config(page_title="Disease Prediction", page_icon="⚕️")
