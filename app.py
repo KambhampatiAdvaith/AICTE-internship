@@ -1,7 +1,6 @@
 import streamlit as st
 import pickle
 
-
 # Change Name & Logo
 st.set_page_config(page_title="Disease Prediction", page_icon="⚕️")
 
@@ -42,13 +41,21 @@ background-color: rgba(0, 0, 0, 0.7);
 st.markdown(page_bg_img, unsafe_allow_html=True)
 
 # Load the saved models
-models = {
-    'diabetes': pickle.load(open('Models/diabetes_model.sav', 'rb')),
-    'heart_disease': pickle.load(open('Models/heart_disease_model.sav', 'rb')),
-    'parkinsons': pickle.load(open('Models/parkinsons_model.sav', 'rb')),
-    'lung_cancer': pickle.load(open('Models/lungs_disease_model.sav', 'rb')),
-    'thyroid': pickle.load(open('Models/Thyroid_model.sav', 'rb'))
+models = {}
+model_files = {
+    'diabetes': 'Models/diabetes_model.sav',  # Added diabetes model
+    'heart_disease': 'Models/heart_disease_model.sav',
+    'parkinsons': 'Models/parkinsons_model.sav',
+    'lung_cancer': 'Models/lung_cancer_model.sav',
+    'thyroid': 'Models/thyroid_model.sav'
 }
+
+for disease, path in model_files.items():
+    try:
+        with open(path, 'rb') as file:
+            models[disease] = pickle.load(file)
+    except Exception as e:
+        st.error(f"Error loading {disease} model: {e}")
 
 # Create a dropdown menu for disease prediction
 selected = st.selectbox(
@@ -66,14 +73,6 @@ def display_input(label, tooltip, key, type="text"):
     elif type == "number":
         return st.number_input(label, key=key, help=tooltip, step=1)
 
-def predict_disease(model, inputs):
-    try:
-        prediction = model.predict([inputs])
-        return prediction[0]
-    except Exception as e:
-        st.error(f"An error occurred during prediction: {e}")
-        return None
-
 # Diabetes Prediction Page
 if selected == 'Diabetes Prediction':
     st.title('Diabetes')
@@ -88,12 +87,14 @@ if selected == 'Diabetes Prediction':
     DiabetesPedigreeFunction = display_input('Diabetes Pedigree Function value', 'Enter diabetes pedigree function value', 'DiabetesPedigreeFunction', 'number')
     Age = display_input('Age of the Person', 'Enter age of the person', 'Age', 'number')
 
+    diab_diagnosis = ''
     if st.button('Diabetes Test Result'):
-        inputs = [Pregnancies, Glucose, BloodPressure, SkinThickness, Insulin, BMI, DiabetesPedigreeFunction, Age]
-        prediction = predict_disease(models['diabetes'], inputs)
-        if prediction is not None:
-            diab_diagnosis = 'The person is diabetic' if prediction == 1 else 'The person is not diabetic'
+        if 'diabetes' in models:
+            diab_prediction = models['diabetes'].predict([[Pregnancies, Glucose, BloodPressure, SkinThickness, Insulin, BMI, DiabetesPedigreeFunction, Age]])
+            diab_diagnosis = 'The person has diabetes' if diab_prediction[0] == 1 else 'The person does not have diabetes'
             st.success(diab_diagnosis)
+        else:
+            st.error("Diabetes model not found! Please check model loading.")
 
 # Heart Disease Prediction Page
 if selected == 'Heart Disease Prediction':
@@ -114,12 +115,11 @@ if selected == 'Heart Disease Prediction':
     ca = display_input('Major vessels colored by fluoroscopy (0-3)', 'Enter number of major vessels', 'ca', 'number')
     thal = display_input('Thal (0 = normal; 1 = fixed defect; 2 = reversible defect)', 'Enter thal value', 'thal', 'number')
 
+    heart_diagnosis = ''
     if st.button('Heart Disease Test Result'):
-        inputs = [age, sex, cp, trestbps, chol, fbs, restecg, thalach, exang, oldpeak, slope, ca, thal]
-        prediction = predict_disease(models['heart_disease'], inputs)
-        if prediction is not None:
-            heart_diagnosis = 'The person has heart disease' if prediction == 1 else 'The person does not have heart disease'
-            st.success(heart_diagnosis)
+        heart_prediction = models['heart_disease'].predict([[age, sex, cp, trestbps, chol, fbs, restecg, thalach, exang, oldpeak, slope, ca, thal]])
+        heart_diagnosis = 'The person has heart disease' if heart_prediction[0] == 1 else 'The person does not have heart disease'
+        st.success(heart_diagnosis)
 
 # Parkinson's Prediction Page
 if selected == "Parkinsons Prediction":
@@ -149,12 +149,11 @@ if selected == "Parkinsons Prediction":
     D2 = display_input('D2', 'Enter D2 value', 'D2', 'number')
     PPE = display_input('PPE', 'Enter PPE value', 'PPE', 'number')
 
+    parkinsons_diagnosis = ''
     if st.button("Parkinson's Test Result"):
-        inputs = [fo, fhi, flo, Jitter_percent, Jitter_Abs, RAP, PPQ, DDP, Shimmer, Shimmer_dB, APQ3, APQ5, APQ, DDA, NHR, HNR, RPDE, DFA, spread1, spread2, D2, PPE]
-        prediction = predict_disease(models['parkinsons'], inputs)
-        if prediction is not None:
-            parkinsons_diagnosis = "The person has Parkinson's disease" if prediction == 1 else "The person does not have Parkinson's disease"
-            st.success(parkinsons_diagnosis)
+        parkinsons_prediction = models['parkinsons'].predict([[fo, fhi, flo, Jitter_percent, Jitter_Abs, RAP, PPQ, DDP, Shimmer, Shimmer_dB, APQ3, APQ5, APQ, DDA, NHR, HNR, RPDE, DFA, spread1, spread2, D2, PPE]])
+        parkinsons_diagnosis = "The person has Parkinson's disease" if parkinsons_prediction[0] == 1 else "The person does not have Parkinson's disease"
+        st.success(parkinsons_diagnosis)
 
 # Lung Cancer Prediction Page
 if selected == "Lung Cancer Prediction":
@@ -177,12 +176,11 @@ if selected == "Lung Cancer Prediction":
     SWALLOWING_DIFFICULTY = display_input('Swallowing Difficulty (1 = Yes; 0 = No)', 'Enter if the person has difficulty swallowing', 'SWALLOWING_DIFFICULTY', 'number')
     CHEST_PAIN = display_input('Chest Pain (1 = Yes; 0 = No)', 'Enter if the person experiences chest pain', 'CHEST_PAIN', 'number')
 
+    lungs_diagnosis = ''
     if st.button("Lung Cancer Test Result"):
-        inputs = [GENDER, AGE, SMOKING, YELLOW_FINGERS, ANXIETY, PEER_PRESSURE, CHRONIC_DISEASE, FATIGUE, ALLERGY, WHEEZING, ALCOHOL_CONSUMING, COUGHING, SHORTNESS_OF_BREATH, SWALLOWING_DIFFICULTY, CHEST_PAIN]
-        prediction = predict_disease(models['lung_cancer'], inputs)
-        if prediction is not None:
-            lungs_diagnosis = "The person has lung cancer disease" if prediction == 1 else "The person does not have lung cancer disease"
-            st.success(lungs_diagnosis)
+        lungs_prediction = models['lung_cancer'].predict([[GENDER, AGE, SMOKING, YELLOW_FINGERS, ANXIETY, PEER_PRESSURE, CHRONIC_DISEASE, FATIGUE, ALLERGY, WHEEZING, ALCOHOL_CONSUMING, COUGHING, SHORTNESS_OF_BREATH, SWALLOWING_DIFFICULTY, CHEST_PAIN]])
+        lungs_diagnosis = "The person has lung cancer disease" if lungs_prediction[0] == 1 else "The person does not have lung cancer disease"
+        st.success(lungs_diagnosis)
 
 # Hypo-Thyroid Prediction Page
 if selected == "Hypo-Thyroid Prediction":
@@ -197,9 +195,8 @@ if selected == "Hypo-Thyroid Prediction":
     t3 = display_input('T3 Level', 'Enter T3 level', 't3', 'number')
     tt4 = display_input('TT4 Level', 'Enter TT4 level', 'tt4', 'number')
 
+    thyroid_diagnosis = ''
     if st.button("Thyroid Test Result"):
-        inputs = [age, sex, on_thyroxine, tsh, t3_measured, t3, tt4]
-        prediction = predict_disease(models['thyroid'], inputs)
-        if prediction is not None:
-            thyroid_diagnosis = "The person has Hypo-Thyroid disease" if prediction == 1 else "The person does not have Hypo-Thyroid disease"
-            st.success(thyroid_diagnosis)
+        thyroid_prediction = models['thyroid'].predict([[age, sex, on_thyroxine, tsh, t3_measured, t3, tt4]])
+        thyroid_diagnosis = "The person has Hypo-Thyroid disease" if thyroid_prediction[0] == 1 else "The person does not have Hypo-Thyroid disease"
+        st.success(thyroid_diagnosis)
