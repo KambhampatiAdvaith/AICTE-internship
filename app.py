@@ -81,10 +81,11 @@ if selected == 'Diabetes Prediction':
     Age = display_input('Age of the Person', 'Enter age of the person', 'Age', 'number')
 
     diab_diagnosis = ''
-    if st.button('Diabetes Test Result'):
-        diab_prediction = models['diabetes'].predict([[Pregnancies, Glucose, BloodPressure, SkinThickness, Insulin, BMI, DiabetesPedigreeFunction, Age]])
-        diab_diagnosis = 'The person is diabetic' if diab_prediction[0] == 1 else 'The person is not diabetic'
-        st.success(diab_diagnosis)
+   # Load models
+    for key, file in model_files.items():
+    with open(file, 'rb') as f:
+        models[key] = pickle.load(f)
+
 
 # Heart Disease Prediction Page
 if selected == 'Heart Disease Prediction':
