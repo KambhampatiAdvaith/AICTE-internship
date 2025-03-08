@@ -54,8 +54,9 @@ for disease, path in model_files.items():
     try:
         with open(path, 'rb') as file:
             models[disease] = pickle.load(file)
+            st.success(f"Successfully loaded {disease} model from {path}")
     except Exception as e:
-        st.error(f"Error loading {disease} model: {e}")
+        st.error(f"Error loading {disease} model from {path}: {e}")
 
 # Create a dropdown menu for disease prediction
 selected = st.selectbox(
