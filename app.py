@@ -19,7 +19,8 @@ st.title('AI-Powered Medical Diagnosis System')
 
 # Sidebar for navigation
 st.sidebar.title("Disease Prediction")
-option = st.sidebar.radio("Select Disease to Predict", ['Diabetes', 'Heart Disease', 'Parkinson's Disease', 'Lung Cancer'])
+option = st.sidebar.radio("Select Disease to Predict", ["Diabetes", "Heart Disease", "Parkinson's Disease", "Lung Cancer"])
+
 
 if option == 'Diabetes':
     st.header('Diabetes Prediction')
