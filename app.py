@@ -189,4 +189,4 @@ if selected == "Hypo-Thyroid Prediction":
     if st.button("Thyroid Test Result"):
         thyroid_prediction = models['thyroid'].predict([[age, sex, on_thyroxine, tsh, t3_measured, t3, tt4]])
         thyroid_diagnosis = "The person has Hypo-Thyroid disease" if thyroid_prediction[0] == 1 else "The person does not have Hypo-Thyroid disease"
-        st.success(thyroid_diagnosis
+        st.success(thyroid_diagnosis)
