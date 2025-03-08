@@ -1,7 +1,6 @@
 import streamlit as st
 import pickle
 
-
 # Change Name & Logo
 st.set_page_config(page_title="Disease Prediction", page_icon="⚕️")
 
@@ -44,11 +43,19 @@ st.markdown(page_bg_img, unsafe_allow_html=True)
 # Load the saved models
 models = {}
 model_files = {
+    'diabetes': 'Models/diabetes_model.sav',  # Added diabetes model
     'heart_disease': 'Models/heart_disease_model.sav',
     'parkinsons': 'Models/parkinsons_model.sav',
-    'lung_cancer': 'Models/lung_cancer_model.sav',  # Renamed for clarity
-    'thyroid': 'Models/thyroid_model.sav'  # Lowercase for consistency
+    'lung_cancer': 'Models/lung_cancer_model.sav',
+    'thyroid': 'Models/thyroid_model.sav'
 }
+
+for disease, path in model_files.items():
+    try:
+        with open(path, 'rb') as file:
+            models[disease] = pickle.load(file)
+    except Exception as e:
+        st.error(f"Error loading {disease} model: {e}")
 
 # Create a dropdown menu for disease prediction
 selected = st.selectbox(
@@ -81,11 +88,13 @@ if selected == 'Diabetes Prediction':
     Age = display_input('Age of the Person', 'Enter age of the person', 'Age', 'number')
 
     diab_diagnosis = ''
-    if 'diabetes' in models:
-    diab_prediction = models['diabetes'].predict([[Pregnancies, Glucose, BloodPressure, SkinThickness, Insulin, BMI, DiabetesPedigreeFunction, Age]])
-else:
-    st.error("Diabetes model not found! Please check model loading.")
-
+    if st.button('Diabetes Test Result'):
+        if 'diabetes' in models:
+            diab_prediction = models['diabetes'].predict([[Pregnancies, Glucose, BloodPressure, SkinThickness, Insulin, BMI, DiabetesPedigreeFunction, Age]])
+            diab_diagnosis = 'The person has diabetes' if diab_prediction[0] == 1 else 'The person does not have diabetes'
+            st.success(diab_diagnosis)
+        else:
+            st.error("Diabetes model not found! Please check model loading.")
 
 # Heart Disease Prediction Page
 if selected == 'Heart Disease Prediction':
