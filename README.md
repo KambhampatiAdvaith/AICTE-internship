@@ -51,4 +51,3 @@ To develop an AI-based diagnostic assistant that helps identify diseases early b
 
 ---
 
-Feel free to ask if you want to include a **demo video link**, **installation guide**, or **badges (like MIT license, Python version, etc.)** to make the README even more impressive.
