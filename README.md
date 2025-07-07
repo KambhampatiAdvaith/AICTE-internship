@@ -10,7 +10,7 @@ This project is a smart and scalable **Disease Prediction System** built using M
 
 ###  Key Highlights
 
-* 🔬 Predicts multiple diseases using individual trained ML models:
+*  Predicts multiple diseases using individual trained ML models:
 
   *  Heart Disease
   *  Lung Cancer
